@@ -1,0 +1,451 @@
+{
+  "title": "CRM Backend (g367:8080)",
+  "uid": "sovren-crm-backend",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "CRM Service Health",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"crm\"}",
+          "legendFormat": "Status",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 1,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "HEALTHY"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "DOWN"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Contact Operations (Rate)",
+      "type": "graph",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 9,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "rate(crm_contact_created_total[1m])",
+          "legendFormat": "Created",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(crm_contact_updated_total[1m])",
+          "legendFormat": "Updated",
+          "refId": "B"
+        },
+        {
+          "expr": "rate(crm_contact_deleted_total[1m])",
+          "legendFormat": "Deleted",
+          "refId": "C"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "ops",
+          "label": "Ops/sec"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 1
+    },
+    {
+      "id": 3,
+      "title": "Total Contacts",
+      "type": "stat",
+      "gridPos": {
+        "x": 15,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "crm_contact_created_total - crm_contact_deleted_total",
+          "legendFormat": "Active Contacts",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "blue"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Shadow Board Analysis Duration (P95)",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(shadowboard_analysis_duration_seconds_bucket[5m]))",
+          "legendFormat": "P95 Duration",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.50, rate(shadowboard_analysis_duration_seconds_bucket[5m]))",
+          "legendFormat": "P50 Duration",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "s",
+          "label": "Duration"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 0,
+      "linewidth": 2,
+      "legend": {
+        "show": true,
+        "avg": true,
+        "max": true
+      }
+    },
+    {
+      "id": 5,
+      "title": "Shadow Board Analysis Rate",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(shadowboard_analysis_total[1m])",
+          "legendFormat": "Total Analyses",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(shadowboard_analysis_failures_total[1m])",
+          "legendFormat": "Failures",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "ops",
+          "label": "Analyses/sec"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 1
+    },
+    {
+      "id": 6,
+      "title": "Shadow Board Strategic Fit Score",
+      "type": "gauge",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "avg(shadowboard_strategic_fit_score)",
+          "legendFormat": "Avg Fit Score",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 75,
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "API Request Latency (P95)",
+      "type": "graph",
+      "gridPos": {
+        "x": 6,
+        "y": 10,
+        "w": 9,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(crm_api_request_duration_seconds_bucket{job=\"crm\"}[5m]))",
+          "legendFormat": "{{endpoint}} P95",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "s",
+          "label": "Latency"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 0,
+      "linewidth": 2
+    },
+    {
+      "id": 8,
+      "title": "API Request Rate by Endpoint",
+      "type": "graph",
+      "gridPos": {
+        "x": 15,
+        "y": 10,
+        "w": 9,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(crm_api_requests_total[1m])",
+          "legendFormat": "{{endpoint}} - {{method}}",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "reqps",
+          "label": "Requests/sec"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 1,
+      "stack": true
+    },
+    {
+      "id": 9,
+      "title": "Notes Created by Shadow Board",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "shadowboard_notes_created_total",
+          "legendFormat": "Total Notes",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "ImmuDB Operations",
+      "type": "graph",
+      "gridPos": {
+        "x": 6,
+        "y": 16,
+        "w": 9,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "rate(immudb_writes_total[1m])",
+          "legendFormat": "Writes",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(immudb_reads_total[1m])",
+          "legendFormat": "Reads",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "ops",
+          "label": "Ops/sec"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 1
+    },
+    {
+      "id": 11,
+      "title": "Redis Event Pipeline Queue Depth",
+      "type": "stat",
+      "gridPos": {
+        "x": 15,
+        "y": 16,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "redis_queue_depth",
+          "legendFormat": "Queue Depth",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 100,
+                "color": "yellow"
+              },
+              {
+                "value": 500,
+                "color": "red"
+              }
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    }
+  ]
+}

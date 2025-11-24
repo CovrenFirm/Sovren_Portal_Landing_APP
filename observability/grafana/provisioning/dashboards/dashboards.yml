@@ -1,0 +1,17 @@
+###############################################################################
+# Grafana Dashboard Provisioning
+# Automatic dashboard loading from /var/lib/grafana/dashboards
+###############################################################################
+
+apiVersion: 1
+
+providers:
+  - name: 'Sovren Dashboards'
+    orgId: 1
+    folder: 'Sovren'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

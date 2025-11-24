@@ -1,0 +1,95 @@
+###############################################################################
+# Sovren Observability Stack
+# Production-grade Prometheus + Grafana + Blackbox Exporter
+#
+# Security:
+# - Grafana: 127.0.0.1:3001 (SSH tunnel only)
+# - Prometheus: 127.0.0.1:9090 (local only)
+# - No public port exposure
+#
+# Access via SSH tunnel:
+# ssh -L 3001:127.0.0.1:3001 root@<LINODE-IP>
+###############################################################################
+
+services:
+  portal-metrics:
+    build: ./portal-metrics
+    container_name: sovren-portal-metrics
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9100:9100"
+    networks:
+      - observability
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: sovren-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    networks:
+      - observability
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: sovren-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=sovren_observability_2025
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_HTTP_ADDR=0.0.0.0
+      - GF_SERVER_HTTP_PORT=3001
+      - GF_SERVER_DOMAIN=localhost
+      - GF_SERVER_ROOT_URL=http://localhost:3001/
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3001:3001"
+    networks:
+      - observability
+    depends_on:
+      - prometheus
+
+  blackbox:
+    image: prom/blackbox-exporter:v0.24.0
+    container_name: sovren-blackbox
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/blackbox/blackbox.yml'
+    volumes:
+      - ./blackbox/blackbox.yml:/etc/blackbox/blackbox.yml:ro
+    networks:
+      - observability
+    ports:
+      - "127.0.0.1:9115:9115"
+
+volumes:
+  prometheus_data:
+    name: sovren_prometheus_data
+  grafana_data:
+    name: sovren_grafana_data
+
+networks:
+  observability:
+    name: sovren_observability
+    driver: bridge

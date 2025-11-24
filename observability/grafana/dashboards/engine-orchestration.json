@@ -1,0 +1,446 @@
+{
+  "title": "Engine Orchestration & System Health",
+  "uid": "sovren-engine-orchestration",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "All Services Health Overview",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "up",
+          "legendFormat": "{{job}} ({{node}}:{{port}})",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 1,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "✓"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "✗"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "WireGuard Tunnel Latency (ICMP)",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "probe_duration_seconds{job=\"wireguard-icmp\"} * 1000",
+          "legendFormat": "{{node}} RTT",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "ms",
+          "label": "Latency (ms)"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 0,
+      "linewidth": 2,
+      "legend": {
+        "show": true,
+        "alignAsTable": true,
+        "avg": true,
+        "max": true,
+        "current": true
+      },
+      "alert": {
+        "name": "High WireGuard Latency",
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                30
+              ],
+              "type": "gt"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "type": "query"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "title": "WireGuard Tunnel Health (ICMP)",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "probe_success{job=\"wireguard-icmp\"}",
+          "legendFormat": "{{node}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 1,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "REACHABLE"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "UNREACHABLE"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "PhD Engine Execution Rate",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(phd_engine_execution_total[1m])",
+          "legendFormat": "Executions/sec",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(phd_engine_exceptions_total[1m])",
+          "legendFormat": "Exceptions/sec",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "ops",
+          "label": "Ops/sec"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 1
+    },
+    {
+      "id": 5,
+      "title": "Redis Event Pipeline",
+      "type": "graph",
+      "gridPos": {
+        "x": 8,
+        "y": 10,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(redis_events_published_total[1m])",
+          "legendFormat": "Published/sec",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(redis_events_consumed_total[1m])",
+          "legendFormat": "Consumed/sec",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "ops",
+          "label": "Events/sec"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 1
+    },
+    {
+      "id": 6,
+      "title": "Redis Queue Depth",
+      "type": "stat",
+      "gridPos": {
+        "x": 16,
+        "y": 10,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "redis_queue_depth",
+          "legendFormat": "Depth",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 100,
+                "color": "yellow"
+              },
+              {
+                "value": 500,
+                "color": "red"
+              }
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Service Scrape Success Rate",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "up",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "job": "Service",
+              "Value": "Status",
+              "node": "Node",
+              "port": "Port",
+              "service": "Name"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "Status",
+            "desc": false
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "displayMode": "color-background"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "✓ UP",
+              "color": "green"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "✗ DOWN",
+              "color": "red"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Prometheus Scrape Duration",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "scrape_duration_seconds",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "s",
+          "label": "Duration"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 0,
+      "linewidth": 1,
+      "legend": {
+        "show": true,
+        "alignAsTable": true,
+        "avg": true,
+        "max": true
+      }
+    },
+    {
+      "id": 9,
+      "title": "Last Successful Scrape",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "(time() - scrape_samples_scraped > 0) / 60",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "job": "Service",
+              "Value": "Minutes Since Last Scrape",
+              "node": "Node"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center"
+          },
+          "unit": "m"
+        }
+      }
+    }
+  ]
+}

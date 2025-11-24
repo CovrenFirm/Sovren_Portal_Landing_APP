@@ -1,0 +1,344 @@
+{
+  "title": "WireGuard Network Health",
+  "uid": "sovren-wireguard-network",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Cluster Nodes Reachability",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 5
+      },
+      "targets": [
+        {
+          "expr": "probe_success{job=\"wireguard-icmp\"}",
+          "legendFormat": "{{node}} ({{instance}})",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 1,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "REACHABLE"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "UNREACHABLE"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "ICMP Round-Trip Time (RTT)",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "probe_duration_seconds{job=\"wireguard-icmp\"} * 1000",
+          "legendFormat": "{{node}} - {{instance}}",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "ms",
+          "label": "Latency (ms)",
+          "min": 0,
+          "max": 50
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 0,
+      "linewidth": 2,
+      "legend": {
+        "show": true,
+        "alignAsTable": true,
+        "avg": true,
+        "min": true,
+        "max": true,
+        "current": true
+      },
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Packet Loss Detection",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "1 - avg_over_time(probe_success{job=\"wireguard-icmp\"}[30s])",
+          "legendFormat": "{{node}} Packet Loss",
+          "refId": "A"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "percentunit",
+          "label": "Packet Loss %",
+          "min": 0,
+          "max": 0.1
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 2,
+      "linewidth": 2,
+      "alert": {
+        "name": "WireGuard Packet Loss",
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0.01
+              ],
+              "type": "gt"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "type": "query"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "title": "g367 (10.15.38.1) Health",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "probe_duration_seconds{instance=\"10.15.38.1\"} * 1000",
+          "legendFormat": "RTT (ms)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "g333 (10.15.38.49) Health",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 6,
+        "y": 13,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "probe_duration_seconds{instance=\"10.15.38.49\"} * 1000",
+          "legendFormat": "RTT (ms)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "g373 (10.15.38.78) Health",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "probe_duration_seconds{instance=\"10.15.38.78\"} * 1000",
+          "legendFormat": "RTT (ms)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "g374 (10.15.38.102) Health",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 18,
+        "y": 13,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "probe_duration_seconds{instance=\"10.15.38.102\"} * 1000",
+          "legendFormat": "RTT (ms)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Network Statistics Summary",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "probe_duration_seconds{job=\"wireguard-icmp\"} * 1000",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "node": "Node",
+              "instance": "IP Address",
+              "Value": "Current RTT (ms)"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "Current RTT (ms)",
+            "desc": false
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "displayMode": "auto"
+          },
+          "unit": "ms",
+          "decimals": 2
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+###############################################################################
+# Sovren Prometheus Configuration
+# Production scrape targets for Portal + H100 Cluster via WireGuard
+#
+# Network topology:
+# - Linode Portal: host.docker.internal:3000
+# - WireGuard tunnel: wg0 interface
+# - H100 cluster nodes:
+#   - g367: 10.15.38.1 (CRM, TTS, Executives, Governance, Voice)
+#   - g333: 10.15.38.49
+#   - g373: 10.15.38.78
+#   - g374: 10.15.38.102 (Voila Duplex)
+###############################################################################
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+  external_labels:
+    cluster: 'sovren'
+    environment: 'production'
+
+# Alert rules
+rule_files:
+  - 'alerts.yml'
+
+# Scrape configurations
+scrape_configs:
+  ##############################################################################
+  # Portal & API Layer
+  ##############################################################################
+
+  - job_name: 'portal'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['portal-metrics:9100']
+        labels:
+          service: 'sovren-portal'
+          tier: 'frontend'
+          node: 'linode'
+
+  ##############################################################################
+  # H100 Cluster - g367 Node (10.15.38.1)
+  ##############################################################################
+
+  - job_name: 'crm'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['10.15.38.1:8080']
+        labels:
+          service: 'crm-backend'
+          tier: 'backend'
+          node: 'g367'
+          port: '8080'
+
+  - job_name: 'tts-tier1-kokoro'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['10.15.38.1:8200']
+        labels:
+          service: 'tts-kokoro'
+          tier: 'ai-voice'
+          node: 'g367'
+          port: '8200'
+
+  - job_name: 'executives'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['10.15.38.1:8300']
+        labels:
+          service: 'executives'
+          tier: 'ai-executive'
+          node: 'g367'
+          port: '8300'
+
+  - job_name: 'governance'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['10.15.38.1:8400']
+        labels:
+          service: 'governance'
+          tier: 'ai-executive'
+          node: 'g367'
+          port: '8400'
+
+  - job_name: 'voice-demo'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['10.15.38.1:8500']
+        labels:
+          service: 'voice-demo'
+          tier: 'ai-voice'
+          node: 'g367'
+          port: '8500'
+
+  ##############################################################################
+  # H100 Cluster - WebSocket/Duplex Service (g367:8700)
+  ##############################################################################
+
+  - job_name: 'voila-duplex'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['10.15.38.1:8700']
+        labels:
+          service: 'voila-duplex'
+          tier: 'ai-voice-duplex'
+          node: 'g367'
+          port: '8700'
+
+  ##############################################################################
+  # Blackbox Exporter - Health Probes for Non-Instrumented Services
+  ##############################################################################
+
+  - job_name: 'blackbox-http'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://10.15.38.1:8080/health
+          - http://10.15.38.1:8200/health
+          - http://10.15.38.1:8300/health
+          - http://10.15.38.1:8400/health
+          - http://10.15.38.1:8500/health
+          - http://10.15.38.1:8700/health
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  ##############################################################################
+  # WireGuard Tunnel Health - ICMP Probes
+  ##############################################################################
+
+  - job_name: 'wireguard-icmp'
+    scrape_interval: 5s
+    scrape_timeout: 3s
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+      - targets:
+          - 10.15.38.1    # g367
+          - 10.15.38.49   # g333
+          - 10.15.38.78   # g373
+          - 10.15.38.57   # g374
+        labels:
+          probe_type: 'icmp'
+          network: 'wireguard'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+      - source_labels: [instance]
+        regex: '10\.15\.38\.1'
+        target_label: node
+        replacement: 'g367'
+      - source_labels: [instance]
+        regex: '10\.15\.38\.49'
+        target_label: node
+        replacement: 'g333'
+      - source_labels: [instance]
+        regex: '10\.15\.38\.78'
+        target_label: node
+        replacement: 'g373'
+      - source_labels: [instance]
+        regex: '10\.15\.38\.57'
+        target_label: node
+        replacement: 'g374'
+
+  ##############################################################################
+  # Prometheus Self-Monitoring
+  ##############################################################################
+
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          tier: 'observability'

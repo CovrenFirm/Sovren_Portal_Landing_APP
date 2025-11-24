@@ -1,0 +1,388 @@
+{
+  "title": "Voice Pipeline (TTS + Duplex)",
+  "uid": "sovren-voice-pipeline",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "TTS Tier-1 Kokoro (g367:8200)",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"tts-tier1-kokoro\"}",
+          "legendFormat": "Status",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 1,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "HEALTHY"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "DOWN"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Voila Duplex (g374:8700)",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"voila-duplex\"}",
+          "legendFormat": "Status",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 1,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "HEALTHY"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "DOWN"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Voice Demo (g367:8500)",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"voice-demo\"}",
+          "legendFormat": "Status",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 1,
+                "color": "green"
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "HEALTHY"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "DOWN"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "TTS Synthesis Latency (P95)",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(tts_synthesis_duration_seconds_bucket{job=\"tts-tier1-kokoro\"}[5m]))",
+          "legendFormat": "P95 Latency",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.50, rate(tts_synthesis_duration_seconds_bucket{job=\"tts-tier1-kokoro\"}[5m]))",
+          "legendFormat": "P50 Latency",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "s",
+          "label": "Duration"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 0,
+      "linewidth": 2,
+      "legend": {
+        "show": true,
+        "avg": true,
+        "max": true
+      }
+    },
+    {
+      "id": 5,
+      "title": "TTS Request Rate",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "rate(tts_requests_total{job=\"tts-tier1-kokoro\"}[1m])",
+          "legendFormat": "Requests/sec",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(tts_requests_failed_total{job=\"tts-tier1-kokoro\"}[1m])",
+          "legendFormat": "Failures/sec",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "reqps",
+          "label": "Requests/sec"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 1
+    },
+    {
+      "id": 6,
+      "title": "Duplex Round-Trip Latency (P95)",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(duplex_rtt_seconds_bucket{job=\"voila-duplex\"}[5m]))",
+          "legendFormat": "P95 RTT",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.50, rate(duplex_rtt_seconds_bucket{job=\"voila-duplex\"}[5m]))",
+          "legendFormat": "P50 RTT",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {
+          "format": "s",
+          "label": "RTT"
+        },
+        {
+          "format": "short"
+        }
+      ],
+      "lines": true,
+      "fill": 0,
+      "linewidth": 2
+    },
+    {
+      "id": 7,
+      "title": "Duplex Active Sessions",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 10,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "duplex_active_sessions{job=\"voila-duplex\"}",
+          "legendFormat": "Sessions",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "blue"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Voice Pipeline Instrumentation Status",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "up{job=~\"tts-tier1-kokoro|voila-duplex|voice-demo\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "job": "Service",
+              "Value": "Status",
+              "node": "Node",
+              "port": "Port"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "center",
+            "displayMode": "auto"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "value": "1",
+              "text": "✓ Instrumented"
+            },
+            {
+              "type": "value",
+              "value": "0",
+              "text": "✗ Down"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
