@@ -4,16 +4,19 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
+import ShadowBoardSection from '@/components/ShadowBoardSection';
 import { cn } from '@/lib/cn';
 
 const VoiceConsole = dynamic(
   () => import('@/components/voice/VoiceConsole').catch(err => {
     console.error('Failed to load VoiceConsole:', err);
-    return { default: () => (
-      <div className="bg-red-900/90 border border-red-700 rounded-lg p-4">
-        <div className="text-red-300 text-sm">Voice Console unavailable</div>
-      </div>
-    )};
+    return {
+      default: () => (
+        <div className="bg-red-900/90 border border-red-700 rounded-lg p-4">
+          <div className="text-red-300 text-sm">Voice Console unavailable</div>
+        </div>
+      )
+    };
   }),
   {
     ssr: false,
@@ -78,13 +81,9 @@ export default function Home() {
 
       <div className="min-h-screen bg-black text-white">
         <section className="relative overflow-hidden bg-black text-white">
-          {/* Cinematic glow background */}
-          <div className="pointer-events-none absolute inset-x-[-40%] -top-64 h-[420px] bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.45),_transparent_60%)] opacity-70" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(236,72,153,0.3),_transparent_55%)] opacity-60" />
-
-          <div className="relative z-10 mx-auto flex max-w-6xl flex-col px-6 pt-24 pb-20 lg:flex-row lg:items-center lg:gap-12 lg:pt-32">
-            {/* LEFT COLUMN – TEXT */}
-            <div className="lg:w-1/2">
+          <div className="relative z-10 mx-auto flex max-w-6xl flex-col px-6 pt-24 pb-20 lg:pt-32">
+            {/* HERO TEXT - Centered/Full Width */}
+            <div className="max-w-4xl">
               {/* Micro-pill */}
               <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-4 py-1 text-xs font-medium text-slate-100 ring-1 ring-slate-700/70">
                 <span>AI Chief of Staff</span>
@@ -95,30 +94,32 @@ export default function Home() {
               </div>
 
               {/* H1 – controlled line breaks + tight leading */}
-              <h1 className="mt-6 text-5xl sm:text-6xl lg:text-7xl font-semibold leading-[0.9] tracking-tight text-white">
+              <h1 className="mt-8 max-w-[20ch] text-5xl sm:text-6xl lg:text-7xl font-semibold leading-[0.9] tracking-tight text-white">
                 <span className="block">Run your company</span>
                 <span className="block">
                   from a{" "}
-                  <span className="whitespace-nowrap bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[#FF6B6B] via-[#A06CD5] to-[#6C63FF] bg-clip-text text-transparent">
                     black-ops
                   </span>
                 </span>
-                <span className="block bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-400 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-[#FF6B6B] via-[#A06CD5] to-[#6C63FF] bg-clip-text text-transparent">
                   command console.
                 </span>
               </h1>
 
               {/* Subhead */}
-              <p className="mt-6 max-w-xl text-lg text-slate-200">
+              <p className="mt-8 max-w-xl text-[1.05rem] sm:text-lg lg:text-xl leading-relaxed text-slate-200 drop-shadow-[0_0_25px_rgba(0,0,0,0.9)]">
                 One AI Chief of Staff, a 21-executive Shadow Board, and an AI Receptionist
-                that answer calls, emails, and CRM for you — all on a sovereign, voice-first
-                operating system.
+                that handles inbound calls for your leadership, routes intelligently based on
+                caller intent, transcribes voicemails into actions, captures leads directly
+                into your CRM, and enforces business hours with after-hours handling — all on
+                a sovereign, voice-first operating system.
               </p>
 
               {/* CTAs */}
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-10 flex flex-wrap gap-4">
                 <Link
-                  href="/signup"
+                  href="#pricing"
                   className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
                 >
                   Start 72-Hour Trial →
@@ -132,116 +133,11 @@ export default function Home() {
               </div>
 
               {/* Trial disclaimer – FINAL TEXT */}
-              <p className="mt-4 text-xs text-slate-400">
+              <p className="mt-6 text-xs text-slate-400">
                 Credit card required. A temporary $1 authorization hold will be placed to
                 verify your card and then released. No subscription charges are captured
                 during your 72-hour trial. Cancel anytime.
               </p>
-            </div>
-
-            {/* RIGHT COLUMN – SOVREN COMMAND STACK PANEL (NO 3D) */}
-            <div className="mt-12 flex justify-center lg:mt-0 lg:w-1/2">
-              <div className="relative w-full max-w-xl rounded-3xl border border-slate-700/80 bg-slate-950/80 p-5 shadow-[0_0_80px_rgba(129,140,248,0.65)] backdrop-blur-xl">
-                {/* Top bar */}
-                <div className="flex items-center justify-between text-xs text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-                    <span className="font-semibold tracking-wide">SOVREN / COMMAND STACK</span>
-                  </div>
-                  <span className="rounded-full bg-slate-900 px-3 py-1 text-[0.65rem] font-medium text-emerald-300 ring-1 ring-emerald-500/50">
-                    LIVE EXECUTION
-                  </span>
-                </div>
-
-                {/* Executive grid */}
-                <div className="mt-5 rounded-2xl border border-slate-700/70 bg-slate-900/70 p-4">
-                  <div className="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.18em] text-slate-400">
-                    <span>Shadow Board</span>
-                    <span>Active Channels</span>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-3 gap-3 text-xs text-slate-200">
-                    {[
-                      "CEO",
-                      "CFO",
-                      "COO",
-                      "CTO",
-                      "CRO",
-                      "CMO",
-                      "CHRO",
-                      "CLO",
-                      "CIO",
-                      "CSO",
-                      "CDO",
-                      "CISO",
-                      "VP-Sales",
-                      "VP-Mktg",
-                      "VP-Ops",
-                      "VP-Prod",
-                      "VP-Legal",
-                      "VP-HR",
-                      "Dir-Sec",
-                      "Dir-Risk",
-                      "Dir-Compl",
-                    ].map((role, idx) => (
-                      <div
-                        key={role}
-                        className="group flex items-center gap-2 rounded-xl bg-slate-950/80 px-2 py-2 ring-1 ring-slate-700/70 hover:ring-indigo-400/80"
-                      >
-                        <div
-                          className={`h-2.5 w-2.5 rounded-full shadow-[0_0_18px_rgba(129,140,248,0.9)] ${
-                            idx < 3
-                              ? "bg-amber-400"
-                              : idx < 7
-                              ? "bg-emerald-400"
-                              : idx < 14
-                              ? "bg-sky-400"
-                              : "bg-fuchsia-400"
-                          }`}
-                        />
-                        <span className="text-[0.7rem] font-medium text-slate-100 group-hover:text-white">
-                          {role}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Activity feed */}
-                <div className="mt-5 rounded-2xl border border-slate-700/60 bg-slate-950/80 p-4">
-                  <div className="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.18em] text-slate-400">
-                    <span>Live command stream</span>
-                    <span>Last 90 seconds</span>
-                  </div>
-                  <div className="mt-3 space-y-2 text-xs">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      <div>
-                        <p className="text-[0.7rem] text-slate-300">
-                          <span className="font-semibold text-emerald-300">CEO</span>{" "}
-                          approved a pricing adjustment and pushed it to CRM + billing.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-sky-400" />
-                      <p className="text-[0.7rem] text-slate-300">
-                        <span className="font-semibold text-sky-300">CFO</span>{" "}
-                        recalculated runway with today&apos;s pipeline and flagged a
-                        risk scenario.
-                      </p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-fuchsia-400" />
-                      <p className="text-[0.7rem] text-slate-300">
-                        <span className="font-semibold text-fuchsia-300">COO</span>{" "}
-                        rerouted low-value calls to the AI Receptionist and pushed only
-                        3 escalations to you.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -310,22 +206,30 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Shadow Board Section */}
+        <ShadowBoardSection />
+
         {/* Comparison Section */}
-        <section className="py-20 px-6 bg-black">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Why Sovren vs Everything Else
+        <section className="relative py-32 px-6 bg-black">
+          {/* Background Grid */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+          <div className="relative z-10 max-w-7xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+                <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                  Why Sovren vs Everything Else
+                </span>
               </h2>
-              <p className="text-xl text-gray-400">
-                You have options. Here's why we're different.
+              <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                The market offers tools. We offer an <span className="text-indigo-400">outcome</span>.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
               <ComparisonCard
                 title="vs Call Bots"
-                subtitle="(Bland, Vapi, etc.)"
+                subtitle="BLAND, VAPI, ETC."
                 points={[
                   'They do: Great single-purpose phone agents',
                   'They don\'t: Execute across channels, maintain strategic context, or integrate with your entire operation',
@@ -334,7 +238,7 @@ export default function Home() {
               />
               <ComparisonCard
                 title="vs Dev Toolkits"
-                subtitle="(Twilio, OpenAI API, etc.)"
+                subtitle="TWILIO, OPENAI API"
                 points={[
                   'They do: Provide building blocks and APIs',
                   'They don\'t: Architect the system, manage state, or give you pre-built executives',
@@ -343,7 +247,7 @@ export default function Home() {
               />
               <ComparisonCard
                 title="vs CRM + AI"
-                subtitle="(Salesforce Einstein, etc.)"
+                subtitle="SALESFORCE EINSTEIN"
                 points={[
                   'They do: Bolt AI onto existing CRM workflows',
                   'They don\'t: Voice-first execution or autonomous multi-executive orchestration',
@@ -622,16 +526,57 @@ interface ComparisonCardProps {
 
 function ComparisonCard({ title, subtitle, points }: ComparisonCardProps) {
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
-      <h3 className="text-2xl font-bold mb-1 text-indigo-400">{title}</h3>
-      <p className="text-sm text-gray-500 mb-4">{subtitle}</p>
-      <ul className="space-y-3">
-        {points.map((point, idx) => (
-          <li key={idx} className="text-gray-300 text-sm flex items-start gap-2">
-            <span className="text-indigo-400 flex-shrink-0 mt-1">•</span>
-            <span>{point}</span>
-          </li>
-        ))}
+    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-950/50 p-8 backdrop-blur-sm transition-all duration-500 hover:border-indigo-500/30 hover:bg-slate-900/80 hover:shadow-[0_0_40px_rgba(99,102,241,0.1)]">
+      {/* Hover Gradient Effect */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500/0 via-purple-500/0 to-pink-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-10" />
+
+      <div className="mb-8 border-b border-white/5 pb-6">
+        <h3 className="text-xl font-medium tracking-wide text-white group-hover:text-indigo-200 transition-colors">
+          {title}
+        </h3>
+        <p className="mt-1 text-xs font-medium uppercase tracking-widest text-slate-500">
+          {subtitle}
+        </p>
+      </div>
+
+      <ul className="space-y-6">
+        {points.map((point, idx) => {
+          // Determine style based on content (heuristic: "Sovren" = win, "They don't" = gap, "They do" = baseline)
+          const isSovren = point.startsWith('Sovren');
+          const isGap = point.startsWith("They don't");
+
+          return (
+            <li key={idx} className="relative pl-6">
+              {/* Line connector */}
+              {idx !== points.length - 1 && (
+                <div className="absolute left-[5px] top-6 h-full w-px bg-white/5" />
+              )}
+
+              {/* Icon/Bullet */}
+              <div className={cn(
+                "absolute left-0 top-1 h-2.5 w-2.5 rounded-full border ring-4 ring-black",
+                isSovren ? "border-emerald-400 bg-emerald-400 ring-black/50" :
+                  isGap ? "border-rose-500/50 bg-transparent" :
+                    "border-slate-600 bg-slate-600"
+              )} />
+
+              <p className={cn(
+                "text-sm leading-relaxed",
+                isSovren ? "text-white font-medium" :
+                  isGap ? "text-slate-400" :
+                    "text-slate-400"
+              )}>
+                {isSovren ? (
+                  <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                    {point}
+                  </span>
+                ) : (
+                  point
+                )}
+              </p>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
