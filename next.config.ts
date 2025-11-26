@@ -26,15 +26,19 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/subscribers/:path*',
-        destination: 'http://10.15.38.1:8400/:path*',
+        destination: 'http://10.66.0.2:8400/:path*',
       },
       {
         source: '/api/executives/:path*',
-        destination: 'http://10.15.38.1:8250/:path*',
+        destination: 'http://10.66.0.2:8250/:path*',
       },
       {
         source: '/api/multichannel/:path*',
-        destination: 'http://10.15.38.1:8450/:path*',
+        destination: 'http://10.66.0.2:8450/:path*',
+      },
+      {
+        source: '/api/voice/:path*',
+        destination: 'http://10.66.0.2:8500/:path*',
       },
     ];
   },
