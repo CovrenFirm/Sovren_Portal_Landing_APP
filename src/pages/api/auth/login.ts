@@ -12,6 +12,9 @@ export default async function handler(
     // Use localhost for development (SSH tunnel), WireGuard IP for production
     const baseUrl = process.env.SUBSCRIBERS_API_URL || 'http://10.66.0.2:8400';
     
+    console.log('[Login API] Using base URL:', baseUrl);
+    console.log('[Login API] Request body:', req.body);
+
     const response = await fetch(`${baseUrl}/api/login`, {
       method: 'POST',
       headers: {
@@ -20,7 +23,10 @@ export default async function handler(
       body: JSON.stringify(req.body),
     });
 
+    console.log('[Login API] Response status:', response.status);
+
     const data = await response.json();
+    console.log('[Login API] Response data:', data);
 
     if (!response.ok) {
       return res.status(response.status).json(data);
@@ -28,7 +34,10 @@ export default async function handler(
 
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Login API error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('[Login API] Detailed error:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : String(error)
+    });
   }
 }
