@@ -9,8 +9,10 @@ export default async function handler(
   }
 
   try {
-    // Forward to subscribers API
-    const response = await fetch('http://10.66.0.2:8400/api/login', {
+    // Use localhost for development (SSH tunnel), WireGuard IP for production
+    const baseUrl = process.env.SUBSCRIBERS_API_URL || 'http://10.66.0.2:8400';
+    
+    const response = await fetch(`${baseUrl}/api/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

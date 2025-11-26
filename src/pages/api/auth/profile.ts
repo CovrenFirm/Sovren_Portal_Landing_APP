@@ -15,8 +15,10 @@ export default async function handler(
       return res.status(401).json({ error: 'No authorization token' });
     }
 
-    // Forward to subscribers API (adjust endpoint as needed)
-    const response = await fetch('http://10.66.0.2:8400/api/profile', {
+    // Use localhost for development (SSH tunnel), WireGuard IP for production
+    const baseUrl = process.env.SUBSCRIBERS_API_URL || 'http://10.66.0.2:8400';
+
+    const response = await fetch(`${baseUrl}/api/profile`, {
       method: 'GET',
       headers: {
         'Authorization': token,
