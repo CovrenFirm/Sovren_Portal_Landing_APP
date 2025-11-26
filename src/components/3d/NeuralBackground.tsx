@@ -99,7 +99,7 @@ function Scene() {
     return (
         <>
             <GridPlane />
-            <EffectComposer disableNormalPass>
+            <EffectComposer>
                 <Bloom
                     luminanceThreshold={0.0} // Bloom everything that has color
                     mipmapBlur

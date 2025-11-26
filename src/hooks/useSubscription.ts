@@ -29,17 +29,30 @@ export function useSubscription(): UseSubscriptionReturn {
                 },
                 body: JSON.stringify({
                     tier,
-                    // If we don't have a subscriber_id yet, the backend might expect email/etc.
-                    console.error('No checkout URL returned', data);
-                    setError('Configuration error: No checkout URL returned');
-                }
-        } catch (err) {
-                console.error('Error starting trial:', err);
-                setError('Failed to initialize checkout. Please try again.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
+                }),
+            });
 
-        return { startTrial, isLoading, error };
-    }
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API Error:', response.status, errorText);
+                throw new Error(`Failed to start trial: ${response.status} ${errorText}`);
+            }
+
+            const data = await response.json();
+
+            if (data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                console.error('No checkout URL returned', data);
+                setError('Configuration error: No checkout URL returned');
+            }
+        } catch (err) {
+            console.error('Error starting trial:', err);
+            setError('Failed to initialize checkout. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { startTrial, isLoading, error };
+}
