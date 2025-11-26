@@ -3,7 +3,7 @@ import { useState } from 'react';
 export type SubscriptionTier = 'SOLO' | 'PROFESSIONAL' | 'BUSINESS';
 
 interface UseSubscriptionReturn {
-    startTrial: (tier: SubscriptionTier) => Promise<void>;
+    startTrial: (tier: SubscriptionTier, email?: string) => Promise<void>;
     isLoading: boolean;
     error: string | null;
 }
@@ -12,24 +12,20 @@ export function useSubscription(): UseSubscriptionReturn {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const startTrial = async (tier: SubscriptionTier) => {
+    const startTrial = async (tier: SubscriptionTier, email?: string) => {
         setIsLoading(true);
         setError(null);
 
         try {
-            // In a real scenario, we might need to get the subscriber_id from auth context
-            // For the landing page, we might be creating a new subscriber or redirecting to a checkout
-            // that handles registration.
-            // Based on the API contract: POST /api/create-checkout
+            // If no email provided, use a placeholder or prompt user
+            const subscriberEmail = email || 'trial@sovrenai.app';
 
-            const response = await fetch('/api/subscribers/api/create-checkout', {
+            // API expects: POST /api/create-checkout?email={email}&tier={tier}
+            const response = await fetch(`/api/subscribers/api/create-checkout?email=${encodeURIComponent(subscriberEmail)}&tier=${tier}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    tier,
-                }),
             });
 
             if (!response.ok) {

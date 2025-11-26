@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import WebSocket from 'ws';
 
 // Use environment variable or fall back to default
-const VOICE_BASE_URL = process.env.SOVREN_VOICE_BASE_URL || process.env.SOVREN_VOICE_DEMO_URL || 'http://10.15.38.1:8500';
+const VOICE_BASE_URL = process.env.SOVREN_VOICE_BASE_URL || process.env.SOVREN_VOICE_DEMO_URL || 'http://10.66.0.2:8500';
 const VOICE_WS_URL = VOICE_BASE_URL.replace(/^http/, 'ws');
 
 // Timeout configurations
