@@ -64,26 +64,27 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        setApiError(result.error || 'Login failed');
+        setApiError(result.error || result.detail || 'Login failed');
         setIsLoading(false);
         return;
       }
 
       // Store authentication data
       const userData = {
-        id: result.data.subscriber_id,
-        email: formData.email,
-        name: '', // Will be fetched from profile endpoint if needed
-        subscriber_id: result.data.subscriber_id,
-        tenant_id: result.data.tenant_id,
-        tier: result.data.tier,
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name,
+        subscriber_id: result.user.id,
+        tenant_id: result.user.tenant_id,
+        tier: result.user.tier,
+        access_level: result.user.access_level,
       };
 
       const tokens = {
-        access_token: result.data.access_token,
-        refresh_token: result.data.refresh_token,
-        token_type: 'Bearer',
-        expires_in: result.data.expires_in,
+        access_token: result.access_token,
+        refresh_token: result.refresh_token || null,
+        token_type: result.token_type,
+        expires_in: result.expires_in || 604800, // 7 days default
       };
 
       login(userData, tokens);
