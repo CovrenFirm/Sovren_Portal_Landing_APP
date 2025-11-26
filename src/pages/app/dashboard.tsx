@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import CommandDeck from '@/components/dashboard/CommandDeck';
-import { requireAuth } from '@/utils/auth-helpers';
+import { requireAuth } from '@/lib/auth';
 
 export default function DashboardPage() {
   return (
@@ -16,11 +16,5 @@ export default function DashboardPage() {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  return requireAuth(context, (user) => {
-    return {
-      props: {
-        user,
-      },
-    };
-  });
+  return requireAuth(context);
 };
