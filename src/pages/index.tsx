@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { cn } from '@/lib/cn';
 import ShadowBoardSection from '@/components/ShadowBoardSection';
+import { useSubscription } from '@/hooks/useSubscription';
 
 // Dynamically import OrbitalBackground with no SSR
 const OrbitalBackground = dynamic(
@@ -95,6 +96,7 @@ function ComparisonCard({ title, subtitle, competitorDescription, sovrenDescript
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
   const [introFadingOut, setIntroFadingOut] = useState(false);
+  const { startTrial, isLoading } = useSubscription();
 
   useEffect(() => {
     // Start fade-out after 1 second
@@ -174,12 +176,13 @@ export default function Home() {
               </p>
 
               <div className="mt-10 flex flex-wrap gap-4">
-                <Link
-                  href="#pricing"
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white hover:from-indigo-500 hover:to-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all hover:scale-105 shadow-lg shadow-indigo-500/20"
+                <button
+                  onClick={() => startTrial('SOLO')}
+                  disabled={isLoading}
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white hover:from-indigo-500 hover:to-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all hover:scale-105 shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Start 72-Hour Trial →
-                </Link>
+                  {isLoading ? 'Processing...' : 'Start 72-Hour Trial →'}
+                </button>
                 <Link
                   href="/demo"
                   className="inline-flex items-center justify-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-100 hover:border-slate-400 hover:bg-slate-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 transition-all hover:scale-105"
@@ -343,8 +346,12 @@ export default function Home() {
                     Email support
                   </li>
                 </ul>
-                <button className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-50 transition-colors">
-                  Start 72-Hour Trial
+                <button
+                  onClick={() => startTrial('SOLO')}
+                  disabled={isLoading}
+                  className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Processing...' : 'Start 72-Hour Trial'}
                 </button>
                 <p className="mt-4 text-xs text-center text-slate-500">
                   Credit card required. Temporary $1 hold. No subscription charges during trial.
@@ -392,8 +399,12 @@ export default function Home() {
                     Custom executive governance
                   </li>
                 </ul>
-                <button className="w-full py-4 rounded-xl bg-white text-indigo-900 font-bold hover:bg-indigo-50 transition-colors shadow-lg">
-                  Start 72-Hour Trial
+                <button
+                  onClick={() => startTrial('PROFESSIONAL')}
+                  disabled={isLoading}
+                  className="w-full py-4 rounded-xl bg-white text-indigo-900 font-bold hover:bg-indigo-50 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Processing...' : 'Start 72-Hour Trial'}
                 </button>
                 <p className="mt-4 text-xs text-center text-indigo-300">
                   Credit card required. Temporary $1 hold. No subscription charges during trial.
@@ -438,8 +449,12 @@ export default function Home() {
                     Audit logs & security
                   </li>
                 </ul>
-                <button className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-50 transition-colors">
-                  Start 72-Hour Trial
+                <button
+                  onClick={() => startTrial('BUSINESS')}
+                  disabled={isLoading}
+                  className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Processing...' : 'Start 72-Hour Trial'}
                 </button>
                 <p className="mt-4 text-xs text-center text-slate-500">
                   Credit card required. Temporary $1 hold. No subscription charges during trial.

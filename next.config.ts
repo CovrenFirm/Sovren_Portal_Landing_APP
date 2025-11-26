@@ -20,6 +20,24 @@ const nextConfig: NextConfig = {
 
   // Turbopack config (empty to silence webpack warning)
   turbopack: {},
+
+  // API Proxy Rewrites
+  async rewrites() {
+    return [
+      {
+        source: '/api/subscribers/:path*',
+        destination: 'http://10.15.38.1:8400/:path*',
+      },
+      {
+        source: '/api/executives/:path*',
+        destination: 'http://10.15.38.1:8250/:path*',
+      },
+      {
+        source: '/api/multichannel/:path*',
+        destination: 'http://10.15.38.1:8450/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
