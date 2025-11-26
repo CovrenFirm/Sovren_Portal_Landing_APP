@@ -1,32 +1,96 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Head from 'next/head';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import ShadowBoardSection from '@/components/ShadowBoardSection';
 import { cn } from '@/lib/cn';
+import ShadowBoardSection from '@/components/ShadowBoardSection';
 
-const VoiceConsole = dynamic(
-  () => import('@/components/voice/VoiceConsole').catch(err => {
-    console.error('Failed to load VoiceConsole:', err);
-    return {
-      default: () => (
-        <div className="bg-red-900/90 border border-red-700 rounded-lg p-4">
-          <div className="text-red-300 text-sm">Voice Console unavailable</div>
-        </div>
-      )
-    };
-  }),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="bg-slate-900/90 border border-slate-700 rounded-lg p-4">
-        <div className="text-slate-300 text-sm">Initializing Voice Console...</div>
-      </div>
-    )
-  }
+// Dynamically import OrbitalBackground with no SSR
+const OrbitalBackground = dynamic(
+  () => import('@/components/3d/OrbitalBackground'),
+  { ssr: false }
 );
+
+const VoiceConsole = dynamic(() => import('@/components/voice/VoiceConsole'), {
+  ssr: false,
+});
+
+// Feature Card Component
+interface FeatureCardProps {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
+  return (
+    <div className="group relative p-8 rounded-2xl bg-indigo-950/20 border border-indigo-500/40 backdrop-blur-sm transition-all duration-300 hover:bg-indigo-900/40 hover:border-indigo-400 hover:shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:-translate-y-1 overflow-hidden">
+      {/* Hover Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      {/* Icon Container */}
+      <div className="relative z-10 w-14 h-14 mb-6 rounded-xl bg-indigo-900/50 border border-indigo-500/50 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(99,102,241,0.3)] group-hover:scale-110 group-hover:border-indigo-400 group-hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all duration-300">
+        {icon}
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10">
+        <h3 className="text-xl font-bold mb-3 text-white group-hover:text-indigo-200 transition-colors">{title}</h3>
+        <p className="text-indigo-200/80 leading-relaxed text-sm font-medium group-hover:text-indigo-100 transition-colors">{description}</p>
+      </div>
+
+      {/* Decorative Corner */}
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-indigo-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    </div>
+  );
+}
+
+// Comparison Card Component
+interface ComparisonCardProps {
+  title: string;
+  subtitle: string;
+  competitorDescription: string;
+  sovrenDescription: string;
+  features: { label: string; value: string }[];
+}
+
+function ComparisonCard({ title, subtitle, competitorDescription, sovrenDescription, features }: ComparisonCardProps) {
+  return (
+    <div className="group relative p-8 rounded-2xl bg-slate-900 border border-indigo-500 hover:bg-slate-900 hover:border-indigo-400 transition-all duration-500 hover:-translate-y-1 shadow-[0_0_30px_rgba(79,70,229,0.25)] hover:shadow-[0_0_50px_rgba(99,102,241,0.5)]">
+      {/* Header */}
+      <div className="mb-8 pb-6 border-b border-slate-800 group-hover:border-indigo-500/30 transition-colors">
+        <h3 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-indigo-100 transition-colors">{title}</h3>
+        <div className="text-xs font-bold tracking-[0.2em] text-indigo-400 uppercase opacity-80 group-hover:opacity-100 group-hover:text-indigo-300 transition-all">{subtitle}</div>
+      </div>
+
+      {/* Comparison Grid */}
+      <div className="grid gap-6 mb-8">
+        <div className="space-y-2 opacity-60 group-hover:opacity-40 transition-opacity">
+          <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">The Old Way</div>
+          <p className="text-sm text-slate-200 leading-relaxed">{competitorDescription}</p>
+        </div>
+
+        <div className="space-y-2">
+          <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            The Sovren Way
+          </div>
+          <p className="text-sm text-white font-medium leading-relaxed group-hover:text-indigo-50 transition-colors">{sovrenDescription}</p>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="space-y-3 pt-6 border-t border-slate-800 group-hover:border-indigo-500/20 transition-colors">
+        {features.map((feature, idx) => (
+          <div key={idx} className="flex justify-between items-center text-sm">
+            <span className="text-slate-300 font-medium">{feature.label}</span>
+            <span className="text-white font-bold">{feature.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -70,7 +134,7 @@ export default function Home() {
         >
           <div className="text-center space-y-4">
             <div className="text-6xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              SOVREN
+              SOVREN AI
             </div>
             <div className="text-xl text-gray-400 tracking-widest">
               COMMAND YOUR FUTURE
@@ -79,21 +143,15 @@ export default function Home() {
         </div>
       )}
 
-      <div className="min-h-screen bg-black text-white">
-        <section className="relative overflow-hidden bg-black text-white">
+      <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30">
+        <OrbitalBackground />
+
+        <section className="relative overflow-hidden text-white">
+          {/* Dark overlay for readability - Adjusted to prevent top truncation */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black/90 z-0" />
           <div className="relative z-10 mx-auto flex max-w-6xl flex-col px-6 pt-24 pb-20 lg:pt-32">
             {/* HERO TEXT - Centered/Full Width */}
             <div className="max-w-4xl">
-              {/* Micro-pill */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-4 py-1 text-xs font-medium text-slate-100 ring-1 ring-slate-700/70">
-                <span>AI Chief of Staff</span>
-                <span className="h-1 w-1 rounded-full bg-slate-500" />
-                <span>21-Executive Shadow Board</span>
-                <span className="h-1 w-1 rounded-full bg-slate-500" />
-                <span>Voice-First OS</span>
-              </div>
-
-              {/* H1 – controlled line breaks + tight leading */}
               <h1 className="mt-8 max-w-[20ch] text-5xl sm:text-6xl lg:text-7xl font-semibold leading-[0.9] tracking-tight text-white">
                 <span className="block">Run your company</span>
                 <span className="block">
@@ -107,7 +165,6 @@ export default function Home() {
                 </span>
               </h1>
 
-              {/* Subhead */}
               <p className="mt-8 max-w-xl text-[1.05rem] sm:text-lg lg:text-xl leading-relaxed text-slate-200 drop-shadow-[0_0_25px_rgba(0,0,0,0.9)]">
                 One AI Chief of Staff, a 21-executive Shadow Board, and an AI Receptionist
                 that handles inbound calls for your leadership, routes intelligently based on
@@ -116,23 +173,21 @@ export default function Home() {
                 a sovereign, voice-first operating system.
               </p>
 
-              {/* CTAs */}
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link
                   href="#pricing"
-                  className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/40 hover:bg-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white hover:from-indigo-500 hover:to-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all hover:scale-105 shadow-lg shadow-indigo-500/20"
                 >
                   Start 72-Hour Trial →
                 </Link>
                 <Link
                   href="/demo"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-100 hover:border-slate-400 hover:bg-slate-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+                  className="inline-flex items-center justify-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-100 hover:border-slate-400 hover:bg-slate-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 transition-all hover:scale-105"
                 >
                   Watch Live Demo
                 </Link>
               </div>
 
-              {/* Trial disclaimer – FINAL TEXT */}
               <p className="mt-6 text-xs text-slate-400">
                 Credit card required. A temporary $1 authorization hold will be placed to
                 verify your card and then released. No subscription charges are captured
@@ -142,36 +197,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Live Demo Section */}
-        <section className="py-20 px-6 bg-gradient-to-b from-black to-gray-950">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Experience It Live
+        {/* Features Section - OPAQUE BACKGROUND */}
+        <section className="relative z-10 py-24 px-6 bg-black border-t border-indigo-500/30">
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-black mb-6 text-white tracking-tight">
+                BUILT <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-white to-indigo-300 animate-pulse">DIFFERENT</span>
               </h2>
-              <p className="text-xl text-gray-400">
-                Talk to an AI executive right now. No signup required.
-              </p>
-            </div>
-            <div className="max-w-3xl mx-auto">
-              <VoiceConsole className="shadow-2xl shadow-indigo-500/20" />
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="py-20 px-6 bg-gray-950">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Built Different
-              </h2>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                Not a chatbot. Not a CRM plugin. A complete executive operating system.
+              <p className="text-xl text-indigo-100 max-w-2xl mx-auto font-medium border-l-4 border-indigo-500 pl-6 text-left md:text-center md:border-l-0 md:pl-0 drop-shadow-md">
+                Not a chatbot. Not a CRM plugin. <br className="hidden md:block" />
+                A complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-white to-indigo-300 font-bold">executive operating system</span>.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FeatureCard
                 icon="🤖"
                 title="AI Receptionist"
@@ -206,458 +245,266 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Shadow Board Section */}
-        <ShadowBoardSection />
+        {/* Shadow Board Section - OPAQUE BACKGROUND */}
+        <div className="bg-black relative z-10">
+          <ShadowBoardSection />
+        </div>
 
-        {/* Comparison Section */}
-        <section className="relative py-32 px-6 bg-black">
-          {/* Background Grid */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
-
+        {/* Comparison Section - OPAQUE BACKGROUND & NO PURPLE SPOTLIGHT */}
+        <section className="relative z-10 py-32 px-6 overflow-hidden bg-black">
           <div className="relative z-10 max-w-7xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-                <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                  Why Sovren vs Everything Else
-                </span>
+            <div className="text-center mb-24">
+              <h2 className="text-5xl md:text-6xl font-black tracking-tight mb-8 text-white drop-shadow-2xl">
+                WHY SOVREN AI <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">vs. EVERYTHING ELSE</span>
               </h2>
-              <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                The market offers tools. We offer an <span className="text-indigo-400">outcome</span>.
+              <p className="text-2xl text-slate-100 max-w-3xl mx-auto leading-relaxed font-medium drop-shadow-md">
+                The market offers tools. We offer an <span className="text-white font-bold border-b-4 border-indigo-500">outcome</span>.
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
               <ComparisonCard
-                title="vs Call Bots"
-                subtitle="BLAND, VAPI, ETC."
-                points={[
-                  'They do: Great single-purpose phone agents',
-                  'They don\'t: Execute across channels, maintain strategic context, or integrate with your entire operation',
-                  'Sovren: AI Receptionist PLUS 21-executive brain across all channels'
+                title="vs Voice APIs"
+                subtitle="BLAND, VAPI, RETELL"
+                competitorDescription="Programmable voice streams. Good for reading scripts, but they have no memory, no business context, and no authority."
+                sovrenDescription="A fully autonomous executive that understands your entire business, remembers every client, and negotiates complex deals."
+                features={[
+                  { label: 'Context', value: 'Session Only' },
+                  { label: 'Authority', value: 'None' },
+                  { label: 'Setup', value: 'Weeks of Dev' }
                 ]}
               />
               <ComparisonCard
-                title="vs Dev Toolkits"
-                subtitle="TWILIO, OPENAI API"
-                points={[
-                  'They do: Provide building blocks and APIs',
-                  'They don\'t: Architect the system, manage state, or give you pre-built executives',
-                  'Sovren: Pre-built operating system, not plumbing'
+                title="vs Chatbots"
+                subtitle="INTERCOM, DRIFT"
+                competitorDescription="Passive text trees waiting for input. They deflect tickets but cannot drive a conversation or close a sale."
+                sovrenDescription="Proactive voice intelligence that picks up the phone, navigates gatekeepers, and drives revenue without you lifting a finger."
+                features={[
+                  { label: 'Medium', value: 'Text / Passive' },
+                  { label: 'Goal', value: 'Deflection' },
+                  { label: 'Revenue', value: 'Low Impact' }
                 ]}
               />
               <ComparisonCard
-                title="vs CRM + AI"
-                subtitle="SALESFORCE EINSTEIN"
-                points={[
-                  'They do: Bolt AI onto existing CRM workflows',
-                  'They don\'t: Voice-first execution or autonomous multi-executive orchestration',
-                  'Sovren: The CRM + the brain + the execution engine'
+                title="vs Human Staff"
+                subtitle="EXECUTIVE TEAM"
+                competitorDescription="Limited bandwidth. 8 hours/day. Inconsistent performance. Knowledge walks out the door when they churn."
+                sovrenDescription="21 specialized executives working 24/7. Instant expertise. Perfect recall. Zero churn. Infinite scale."
+                features={[
+                  { label: 'Availability', value: '40 hrs/wk' },
+                  { label: 'Cost', value: '$1.2M+/yr' },
+                  { label: 'Scale', value: 'Linear' }
                 ]}
               />
             </div>
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="py-20 px-6 bg-gradient-to-b from-gray-950 to-black">
+        {/* Pricing Section - OPAQUE BACKGROUND */}
+        <section id="pricing" className="relative z-10 py-32 px-6 bg-black">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">
                 Simple, Transparent Pricing
               </h2>
-              <p className="text-xl text-gray-400">
-                Choose the plan that fits your scale. Start your 72-hour trial today.
+              <p className="text-xl text-slate-400">
+                Cancel anytime. No long-term contracts. Start your 72-hour trial today.
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              <PricingCard
-                tier="Solo Founder"
-                price="$199"
-                period="month"
-                description="Perfect for solo founders and small teams"
-                features={[
-                  '1 AI Receptionist',
-                  '2 C-Suite Executives (CEO, CFO)',
-                  'Up to 500 inbound calls/month',
-                  'Voice + Email + Calendar integration',
-                  'Basic CRM with 1,000 contacts',
-                  '2GB voice storage',
-                  'Email support'
-                ]}
-              />
-              <PricingCard
-                tier="Professional"
-                price="$349"
-                period="month"
-                featured
-                description="For growing companies that need more firepower"
-                features={[
-                  'Everything in Solo, plus:',
-                  '5 C-Suite Executives (CEO, CFO, CRO, CMO, COO)',
-                  'Up to 1,500 inbound calls/month',
-                  'Multi-user access (5 team members)',
-                  'Advanced CRM with 10,000 contacts',
-                  '10GB voice storage',
-                  'Priority support',
-                  'Custom executive personalities'
-                ]}
-              />
-              <PricingCard
-                tier="Business"
-                price="$1,199"
-                period="month"
-                description="Full executive board for serious operations"
-                features={[
-                  'Everything in Professional, plus:',
-                  '10 C-Suite Executives',
-                  'Up to 5,000 inbound calls/month',
-                  'Unlimited team members',
-                  'Unlimited CRM contacts',
-                  '50GB voice storage',
-                  'Dedicated account manager',
-                  'Custom integrations',
-                  'White-glove onboarding'
-                ]}
-              />
-            </div>
-
-            <div className="text-center mt-12">
-              <p className="text-gray-400 mb-4">
-                Need more than 10 executives or 5,000 calls/month?
-              </p>
-              <Link
-                href="/contact"
-                className="text-indigo-400 hover:text-indigo-300 font-semibold"
-              >
-                Contact us for Enterprise pricing →
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA Section */}
-        <section className="py-20 px-6 bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Stop Being the Bottleneck
-            </h2>
-            <p className="text-xl text-gray-200 mb-8 leading-relaxed">
-              Your competitors are still drowning in emails and managing spreadsheets.
-              You'll be commanding a 21-executive AI board while you sleep.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/signup"
-                className="px-10 py-5 bg-white text-black hover:bg-gray-100 rounded-lg font-bold text-lg text-center transition-all transform hover:scale-105"
-              >
-                Start 72-Hour Trial →
-              </Link>
-              <Link
-                href="/demo"
-                className="px-10 py-5 border-2 border-white hover:bg-white hover:text-black rounded-lg font-bold text-lg text-center transition-all transform hover:scale-105"
-              >
-                See It in Action
-              </Link>
-            </div>
-            <p className="text-sm text-gray-300 mt-6">
-              Credit card required. A temporary $1 authorization hold will be placed to verify
-              your card and then released. No subscription charges are captured during your
-              72-hour trial. Cancel anytime.
-            </p>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="py-12 px-6 bg-black border-t border-gray-900">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-5 gap-8 mb-8">
-              <div className="md:col-span-2">
-                <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                  SOVREN
+              {/* Solo Founder */}
+              <div className="relative p-8 rounded-3xl bg-slate-900/50 border border-slate-800 backdrop-blur-sm hover:border-slate-600 transition-colors">
+                <h3 className="text-xl font-bold text-white mb-2">Solo Founder</h3>
+                <p className="text-sm text-slate-400 mb-6">Perfect for solopreneurs and creators.</p>
+                <div className="flex items-baseline mb-8">
+                  <span className="text-4xl font-bold text-white">$199</span>
+                  <span className="text-slate-500 ml-2">/month</span>
                 </div>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Sovereign, voice-first operating system for your business.
-                  21 AI executives, one unified command center.
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    1 Human User
+                  </li>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    1 AI Receptionist (Inbound calls)
+                  </li>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    1 AI Chief of Staff (Strategy)
+                  </li>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Basic CRM & Calendar integration
+                  </li>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Email support
+                  </li>
+                </ul>
+                <button className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-50 transition-colors">
+                  Start 72-Hour Trial
+                </button>
+                <p className="mt-4 text-xs text-center text-slate-500">
+                  Credit card required. Temporary $1 hold. No subscription charges during trial.
                 </p>
               </div>
 
-              <div>
-                <h3 className="font-semibold mb-4 text-gray-200">Product</h3>
-                <ul className="space-y-2 text-gray-400 text-sm">
-                  <li>
-                    <Link href="/" className="hover:text-white transition-colors">
-                      Overview
-                    </Link>
+              {/* Professional - Highlighted */}
+              <div className="relative p-8 rounded-3xl bg-indigo-950/40 border border-indigo-500/50 backdrop-blur-md shadow-2xl scale-105 z-10">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
+                  Most Popular
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Professional</h3>
+                <p className="text-sm text-indigo-200 mb-6">For growing teams and small businesses.</p>
+                <div className="flex items-baseline mb-8">
+                  <span className="text-5xl font-bold text-white">$349</span>
+                  <span className="text-indigo-200 ml-2">/month</span>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center text-white text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center mr-3 text-xs">✓</span>
+                    Up to 5 Human Users
                   </li>
-                  <li>
-                    <Link href="/demo" className="hover:text-white transition-colors">
-                      Demo
-                    </Link>
+                  <li className="flex items-center text-white text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center mr-3 text-xs">✓</span>
+                    Everything in Solo Founder
                   </li>
-                  <li>
-                    <Link href="#pricing" className="hover:text-white transition-colors">
-                      Pricing
-                    </Link>
+                  <li className="flex items-center text-white text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center mr-3 text-xs">✓</span>
+                    Full Shadow Board (21 AI Executives)
                   </li>
-                  <li>
-                    <Link href="/features" className="hover:text-white transition-colors">
-                      Features
-                    </Link>
+                  <li className="flex items-center text-white text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center mr-3 text-xs">✓</span>
+                    Up to 1,000 inbound calls/month
+                  </li>
+                  <li className="flex items-center text-white text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center mr-3 text-xs">✓</span>
+                    Advanced CRM (HubSpot/Salesforce)
+                  </li>
+                  <li className="flex items-center text-white text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center mr-3 text-xs">✓</span>
+                    Priority support
+                  </li>
+                  <li className="flex items-center text-white text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center mr-3 text-xs">✓</span>
+                    Custom executive governance
                   </li>
                 </ul>
+                <button className="w-full py-4 rounded-xl bg-white text-indigo-900 font-bold hover:bg-indigo-50 transition-colors shadow-lg">
+                  Start 72-Hour Trial
+                </button>
+                <p className="mt-4 text-xs text-center text-indigo-300">
+                  Credit card required. Temporary $1 hold. No subscription charges during trial.
+                </p>
               </div>
 
-              <div>
-                <h3 className="font-semibold mb-4 text-gray-200">Company</h3>
-                <ul className="space-y-2 text-gray-400 text-sm">
-                  <li>
-                    <Link href="/about" className="hover:text-white transition-colors">
-                      About
-                    </Link>
+              {/* Business */}
+              <div className="relative p-8 rounded-3xl bg-slate-900/50 border border-slate-800 backdrop-blur-sm hover:border-slate-600 transition-colors">
+                <h3 className="text-xl font-bold text-white mb-2">Business</h3>
+                <p className="text-sm text-slate-400 mb-6">For high-volume operations.</p>
+                <div className="flex items-baseline mb-8">
+                  <span className="text-4xl font-bold text-white">$1,199</span>
+                  <span className="text-slate-500 ml-2">/month</span>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Up to 10 Human Users
                   </li>
-                  <li>
-                    <Link href="/contact" className="hover:text-white transition-colors">
-                      Contact
-                    </Link>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Everything in Professional
                   </li>
-                  <li>
-                    <Link href="/careers" className="hover:text-white transition-colors">
-                      Careers
-                    </Link>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Unlimited inbound calls
                   </li>
-                  <li>
-                    <Link href="/blog" className="hover:text-white transition-colors">
-                      Blog
-                    </Link>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Dedicated Account Manager
                   </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-4 text-gray-200">Legal</h3>
-                <ul className="space-y-2 text-gray-400 text-sm">
-                  <li>
-                    <Link href="/privacy" className="hover:text-white transition-colors">
-                      Privacy Policy
-                    </Link>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    SLA Guarantees
                   </li>
-                  <li>
-                    <Link href="/terms" className="hover:text-white transition-colors">
-                      Terms of Service
-                    </Link>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Custom API access
                   </li>
-                  <li>
-                    <Link href="/security" className="hover:text-white transition-colors">
-                      Security
-                    </Link>
+                  <li className="flex items-center text-slate-300 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-3 text-xs">✓</span>
+                    Audit logs & security
                   </li>
                 </ul>
+                <button className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-50 transition-colors">
+                  Start 72-Hour Trial
+                </button>
+                <p className="mt-4 text-xs text-center text-slate-500">
+                  Credit card required. Temporary $1 hold. No subscription charges during trial.
+                </p>
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="pt-8 border-t border-gray-900 flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="text-gray-500 text-sm">
-                © 2025 Sovren AI. All rights reserved.
-              </div>
-              <div className="flex gap-6">
-                <a
-                  href="https://twitter.com/sovrenai"
-                  className="text-gray-400 hover:text-white transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                  </svg>
-                </a>
-                <a
-                  href="https://linkedin.com/company/sovrenai"
-                  className="text-gray-400 hover:text-white transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                  </svg>
-                </a>
-                <a
-                  href="https://github.com/sovrenai"
-                  className="text-gray-400 hover:text-white transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                </a>
-              </div>
+        {/* CTA Section - OPAQUE BACKGROUND */}
+        <section className="relative z-10 py-24 px-6 overflow-hidden bg-black">
+          <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/40 to-black z-0" />
+
+          <div className="relative z-10 max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              Stop Being the Bottleneck
+            </h2>
+            <p className="text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">
+              Your competition is still hiring humans and managing spreadsheets. You'll be commanding a 21-executive AI board while you sleep.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="px-8 py-4 rounded-full bg-white text-indigo-900 font-bold text-lg hover:bg-indigo-50 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105">
+                Start 72-Hour Trial →
+              </button>
+              <button className="px-8 py-4 rounded-full border border-indigo-400 text-indigo-100 font-bold text-lg hover:bg-indigo-900/50 transition-all hover:scale-105">
+                See the Demo
+              </button>
             </div>
+            <p className="mt-6 text-sm text-indigo-300/60">
+              Credit card required. A temporary $1 authorization hold will be placed to verify your card and then released. No subscription charges are captured during your 72-hour trial. Cancel anytime.
+            </p>
+          </div>
+        </section>
+
+        {/* Footer - OPAQUE BACKGROUND */}
+        <footer className="relative z-10 py-12 px-6 border-t border-slate-900 bg-black">
+          <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+            <div className="col-span-2">
+              <div className="text-2xl font-bold text-white mb-4">SOVREN</div>
+              <p className="text-slate-500 max-w-sm">
+                The first AI-native executive operating system. Stop running your company alone.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-white mb-4">Product</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li className="hover:text-white cursor-pointer">Features</li>
+                <li className="hover:text-white cursor-pointer">Pricing</li>
+                <li className="hover:text-white cursor-pointer">Demo</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-white mb-4">Legal</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li className="hover:text-white cursor-pointer">Privacy Policy</li>
+                <li className="hover:text-white cursor-pointer">Terms of Service</li>
+                <li className="hover:text-white cursor-pointer">Security</li>
+              </ul>
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-900 text-center text-slate-600 text-sm">
+            © 2024 Sovren AI. All rights reserved.
           </div>
         </footer>
       </div>
     </>
-  );
-}
-
-// Helper Components
-
-interface FeatureCardProps {
-  icon: string;
-  title: string;
-  description: string;
-}
-
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
-  return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 hover:border-indigo-500 transition-all hover:transform hover:scale-105">
-      <div className="text-4xl mb-4">{icon}</div>
-      <h3 className="text-xl font-bold mb-3 text-white">{title}</h3>
-      <p className="text-gray-400 leading-relaxed">{description}</p>
-    </div>
-  );
-}
-
-interface ComparisonCardProps {
-  title: string;
-  subtitle: string;
-  points: string[];
-}
-
-function ComparisonCard({ title, subtitle, points }: ComparisonCardProps) {
-  return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-950/50 p-8 backdrop-blur-sm transition-all duration-500 hover:border-indigo-500/30 hover:bg-slate-900/80 hover:shadow-[0_0_40px_rgba(99,102,241,0.1)]">
-      {/* Hover Gradient Effect */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500/0 via-purple-500/0 to-pink-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-10" />
-
-      <div className="mb-8 border-b border-white/5 pb-6">
-        <h3 className="text-xl font-medium tracking-wide text-white group-hover:text-indigo-200 transition-colors">
-          {title}
-        </h3>
-        <p className="mt-1 text-xs font-medium uppercase tracking-widest text-slate-500">
-          {subtitle}
-        </p>
-      </div>
-
-      <ul className="space-y-6">
-        {points.map((point, idx) => {
-          // Determine style based on content (heuristic: "Sovren" = win, "They don't" = gap, "They do" = baseline)
-          const isSovren = point.startsWith('Sovren');
-          const isGap = point.startsWith("They don't");
-
-          return (
-            <li key={idx} className="relative pl-6">
-              {/* Line connector */}
-              {idx !== points.length - 1 && (
-                <div className="absolute left-[5px] top-6 h-full w-px bg-white/5" />
-              )}
-
-              {/* Icon/Bullet */}
-              <div className={cn(
-                "absolute left-0 top-1 h-2.5 w-2.5 rounded-full border ring-4 ring-black",
-                isSovren ? "border-emerald-400 bg-emerald-400 ring-black/50" :
-                  isGap ? "border-rose-500/50 bg-transparent" :
-                    "border-slate-600 bg-slate-600"
-              )} />
-
-              <p className={cn(
-                "text-sm leading-relaxed",
-                isSovren ? "text-white font-medium" :
-                  isGap ? "text-slate-400" :
-                    "text-slate-400"
-              )}>
-                {isSovren ? (
-                  <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                    {point}
-                  </span>
-                ) : (
-                  point
-                )}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
-
-interface PricingCardProps {
-  tier: string;
-  price: string;
-  period: string;
-  description: string;
-  features: string[];
-  featured?: boolean;
-}
-
-function PricingCard({
-  tier,
-  price,
-  period,
-  description,
-  features,
-  featured = false,
-}: PricingCardProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-lg p-8 transition-all hover:transform hover:scale-105',
-        featured
-          ? 'bg-gradient-to-br from-indigo-900 to-purple-900 border-2 border-indigo-500 shadow-2xl shadow-indigo-500/50 scale-105'
-          : 'bg-gray-900/50 border border-gray-800'
-      )}
-    >
-      {featured && (
-        <div className="text-center mb-4">
-          <span className="inline-block px-4 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full">
-            MOST POPULAR
-          </span>
-        </div>
-      )}
-
-      <h3 className="text-2xl font-bold mb-2 text-white">{tier}</h3>
-      <p className="text-gray-400 text-sm mb-6 min-h-[40px]">{description}</p>
-
-      <div className="mb-6">
-        <span className="text-5xl font-bold text-white">{price}</span>
-        <span className="text-gray-400">/{period}</span>
-      </div>
-
-      <ul className="space-y-3 mb-8">
-        {features.map((feature, idx) => (
-          <li key={idx} className="flex items-start gap-3 text-sm">
-            <svg
-              className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span className="text-gray-300">{feature}</span>
-          </li>
-        ))}
-      </ul>
-
-      <Link
-        href="/signup"
-        className={cn(
-          'block w-full py-4 rounded-lg font-bold text-center transition-all',
-          featured
-            ? 'bg-white text-black hover:bg-gray-100'
-            : 'bg-indigo-600 text-white hover:bg-indigo-500'
-        )}
-      >
-        Start 72-Hour Trial
-      </Link>
-
-      <p className="text-xs text-gray-400 mt-3 text-center">
-        Credit card required. Temporary $1 authorization hold only; no subscription charges during your 72-hour trial.
-      </p>
-    </div>
   );
 }

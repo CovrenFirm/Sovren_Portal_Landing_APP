@@ -72,35 +72,42 @@ const SHADOW_ROLES = [
 
 export default function ShadowBoardSection() {
     return (
-        <section className="bg-black text-white border-t border-slate-800/70 py-20 px-6">
-            <div className="mx-auto max-w-7xl">
-                <div className="max-w-3xl mx-auto text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                        Your executive branch. Named.
+        <section className="relative py-32 px-6 overflow-hidden">
+            {/* Background Spotlight - Intensified */}
+            <div className="relative z-10 mx-auto max-w-7xl">
+                <div className="max-w-4xl mx-auto text-center mb-24">
+                    <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tight text-white">
+                        YOUR EXECUTIVE BRANCH <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">NAMED</span>
                     </h2>
-                    <p className="text-xl text-gray-400">
-                        Sovren drops a receptionist and 20 C-suite roles into your company.
-                        Each seat has a name, a domain, and hard authority limits. When you
-                        hear a decision, you know exactly which chair made it.
+                    <p className="text-2xl text-slate-200 leading-relaxed font-light max-w-3xl mx-auto">
+                        Sovren drops a receptionist and <span className="text-white font-semibold">20 C-suite roles</span> into your company.
+                        Each seat has a name, a domain, and hard authority limits.
                     </p>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-8 md:grid-cols-3">
                     {SHADOW_ROLES.map((group) => (
                         <div
                             key={group.category}
-                            className="flex flex-col rounded-lg p-8 transition-all hover:transform hover:scale-105 bg-gray-900/50 border border-gray-800"
+                            className="group relative flex flex-col rounded-2xl p-8 transition-all duration-300 bg-zinc-900 border border-indigo-500 shadow-[0_0_30px_rgba(79,70,229,0.25)] hover:shadow-[0_0_60px_rgba(79,70,229,0.5)] hover:border-indigo-400 hover:-translate-y-1"
                         >
-                            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 mb-4">
+                            {/* Header with distinct background */}
+                            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-indigo-600/40 to-transparent rounded-t-2xl" />
+
+                            <h3 className="relative z-10 text-sm font-black uppercase tracking-[0.25em] text-indigo-300 mb-8 flex items-center gap-3">
                                 {group.category}
                             </h3>
-                            <ul className="space-y-3">
+
+                            <ul className="relative z-10 space-y-5">
                                 {group.roles.map((role) => (
-                                    <li key={role.code} className="flex items-baseline gap-3">
-                                        <span className="rounded-full bg-slate-900/80 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-100 ring-1 ring-slate-700/80 min-w-[3.5rem] text-center">
-                                            {role.code}
-                                        </span>
-                                        <span className="text-slate-300 text-sm">{role.name}</span>
+                                    <li key={role.code} className="flex items-center gap-4 group/role">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-indigo-500 blur-[4px] opacity-0 group-hover/role:opacity-50 transition-opacity" />
+                                            <span className="relative flex items-center justify-center rounded bg-zinc-800 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white ring-1 ring-white/20 min-w-[4rem] group-hover/role:ring-indigo-400 group-hover/role:bg-indigo-600 transition-all">
+                                                {role.code}
+                                            </span>
+                                        </div>
+                                        <span className="text-white text-base font-bold tracking-wide group-hover/role:text-indigo-100 transition-colors">{role.name}</span>
                                     </li>
                                 ))}
                             </ul>
