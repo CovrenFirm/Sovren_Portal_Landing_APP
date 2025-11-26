@@ -9,9 +9,12 @@ export default async function handler(
   }
 
   try {
-    // Use localhost for development (SSH tunnel), WireGuard IP for production
-    const baseUrl = process.env.SUBSCRIBERS_API_URL || 'http://10.66.0.2:8400';
+    // For development, always use localhost. For production, use WireGuard IP
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'http://10.66.0.2:8400'
+      : 'http://localhost:8400';
     
+    console.log('[Login API] Environment:', process.env.NODE_ENV);
     console.log('[Login API] Using base URL:', baseUrl);
     console.log('[Login API] Request body:', req.body);
 
